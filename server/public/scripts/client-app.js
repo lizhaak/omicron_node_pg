@@ -16,8 +16,10 @@ function getBooks() {
       books.forEach(function (book) {
         var $el = $('<li></li>');
         $el.append('<strong>' + book.title + '</strong>');
-        $el.append(' <em>' + book.author + '</em');
+        $el.append(' <em>' + book.author + '</em>');
         $el.append(' <time>' + book.published + '</time>');
+        $el.append(' <span>' + book.edition + '</span>');
+        $el.append(' <span>' + book.publisher + '</span>');
         $('#book-list').append($el);
       });
     },
@@ -38,6 +40,7 @@ function postBook() {
   $.each($('#book-form').serializeArray(), function (i, field) {
     book[field.name] = field.value;
   });
+
 
   $.ajax({
     type: 'POST',
