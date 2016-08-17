@@ -26,6 +26,31 @@ router.get('/', function(req, res) {
   });
 });
 
+router.get('/:id', function(req, res) {
+  var id = req.params.id;
+  console.log('id', id);
+  // Retrieve books from database
+  pg.connect(connectionString, function(err, client, done) {
+    if (err) {
+      res.sendStatus(500);
+    }
+
+    client.query('SELECT * FROM books ' +
+                'WHERE genre = $1',
+                [id],
+                function (err, result) {
+                  done();
+
+                if (err) {
+                  res.sendStatus(500);
+                }
+
+                res.send(result.rows);
+
+              });
+  });
+});
+
 router.post('/', function (req, res) {
   var book = req.body;  // our book object that we want to add to the database
 

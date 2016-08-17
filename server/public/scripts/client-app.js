@@ -5,6 +5,7 @@ $(document).ready(function () {
   $('#book-submit').on('click', postBook);
   $('#book-list').on('click', '.update', putBook);
   $('#book-list').on('click', '.delete', deleteBook);
+  $('#filter-submit').on('click', filterBooksByGenre);
 });
 /**
  * Retrieve books from server and append to DOM
@@ -133,4 +134,51 @@ function deleteBook() {
     }
   })
 
+}
+
+function filterBooksByGenre() {
+  var filterValue = $('#genres :selected').val();
+
+  $.ajax({
+    type: 'GET',
+    url: '/books/' + filterValue,
+    success: function (books) {
+      console.log('GET /books returns:', books);
+      $('#book-list').empty();
+
+      books.forEach(function (book) {
+        var $el = $('<div></div>');
+
+        var bookProperties = ['title', 'author', 'published', 'edition', 'publisher', 'genre'];
+
+        bookProperties.forEach(function (property) {
+          if (property == 'published') {
+            book[property] = new Date(book[property]);
+
+            //get strings for month/day/year
+            var month = book[property].getUTCMonth(book[property]) + 1; //months from 1-12
+            var day = book[property].getUTCDate(book[property]);
+            var year = book[property].getUTCFullYear(book[property]);
+
+            //catcatcanate into one string month/day/year and set to book.published as text
+            book[property] = month + "/" + day + "/" + year;
+          }
+          var $input = $('<input type="text" id="' + property + '" name="' + property + '" />');
+          $input.val(book[property]);
+          $el.append($input);
+        });
+
+        $el.data('bookId', book.id);
+        $el.append('<button class="update">Update</button>');
+        $el.append('<button class="delete">Delete</button>');
+
+        $('#book-list').append($el);
+
+      });
+    },
+
+    error: function (response) {
+      console.log('GET /books fail. No books could be retrieved!');
+    },
+  });
 }
